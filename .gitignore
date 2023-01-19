@@ -1,0 +1,38 @@
+bin/
+gen/
+gen-external-apklibs/
+out/
+build/
+captures
+# maven output folder
+target
+
+# Local configuration file (sdk path, etc)
+local.properties
+
+# Eclipse project files
+.classpath
+.project
+
+# Android Studio
+/local.properties
+/*/local.properties
+# Built application files
+/*/build/
+
+# gradle directory
+.gradle
+
+
+.idea/
+.idea/.name
+.idea/compiler.xml
+.idea/copyright/profiles_settings.xml
+.idea/encodings.xml
+.idea/libraries/
+.idea/tasks.xml
+.idea/misc.xml
+.idea/modules.xml
+.idea/scopes/scope_settings.xml
+.idea/vcs.xml
+.idea/workspace.xml
