@@ -1,5 +1,6 @@
 package com.example.weatherandroidapplication
 
+import WeatherX
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
@@ -23,10 +24,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
+import com.example.weatherandroidapplication.Models.WeatherClass
 import com.example.weatherandroidapplication.network.WeatherApi
 //import com.example.weatherandroidapplication.network.WeatherApi
 import com.example.weatherandroidapplication.ui.theme.WeatherAndroidApplicationTheme
 import com.example.weatherandroidapplication.viewmodel.WeatherViewModel
+import kotlinx.coroutines.delay
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.http.GET
@@ -57,18 +60,34 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    weatherViewModel.city = "Delhi"
-                    weatherViewModel.country = "IN"
-                    weatherViewModel.key = "9fcb60c4b3984edb99886da0d26b8ee7"
-                    weatherViewModel.getWeatherData()
-                    println("Weather for chosen city is")
-                    if(weatherViewModel.weatherResponse.count!=0){
-                        println(weatherViewModel.weatherResponse.data[0].temp)
+                    val cityList:List<String> = listOf("Kolkata","Delhi","Mumbai","Chennai")
+                    val topCitiesWeatherMutableList = mutableListOf<WeatherClass>()
+                    for (city in cityList){
+                        weatherViewModel.city = city
+                        weatherViewModel.country = "IN"
+                        weatherViewModel.key = "9fcb60c4b3984edb99886da0d26b8ee7"
+                        weatherViewModel.getWeatherData()
+
+                        println("Weather for chosen city $weatherViewModel.city is")
+                        if(weatherViewModel.weatherResponse.count!=0){
+                            println(weatherViewModel.weatherResponse.data[0].temp)
+                            var weatherRes = weatherViewModel.weatherResponse
+                            println("Object is")
+                            println(weatherRes)
+                            topCitiesWeatherMutableList.add(weatherRes)
+                        }
+
+                        else{
+                            println("No data found")
+                        }
+
+                        //delay(2000)
+
                     }
 
-                    else{
-                        println("No data returned")
-                    }
+                    println(topCitiesWeatherMutableList)
+
+
 
                     MainContent()
                 }
@@ -76,6 +95,8 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
+
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
