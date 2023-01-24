@@ -1,10 +1,10 @@
-package com.example.weatherandroidapplication.Models
+package com.example.weatherandroidapplication.models
 
 import WeatherX
 
 data class Data(
-    val app_temp: Double,
-    val aqi: Int,
+    val app_temp2: Double = 0.0,
+    val aqi: Int = 0,
     val city_name: String,
     val clouds: Int,
     val country_code: String,
@@ -40,5 +40,5 @@ data class Data(
     val wind_cdir: String,
     val wind_cdir_full: String,
     val wind_dir: Int,
-    val wind_spd: Double
+    val wind_spd: Double,
 )

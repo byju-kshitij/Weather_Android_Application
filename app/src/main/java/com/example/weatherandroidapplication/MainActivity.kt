@@ -1,61 +1,39 @@
 package com.example.weatherandroidapplication
 
-import WeatherX
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import com.example.weatherandroidapplication.Models.WeatherClass
-import com.example.weatherandroidapplication.network.WeatherApi
+import com.example.weatherandroidapplication.models.WeatherClass
 //import com.example.weatherandroidapplication.network.WeatherApi
 import com.example.weatherandroidapplication.ui.theme.WeatherAndroidApplicationTheme
+import com.example.weatherandroidapplication.viewmodel.WeatherRequest
+import com.example.weatherandroidapplication.viewmodel.WeatherRequest.Error
+import com.example.weatherandroidapplication.viewmodel.WeatherRequest.Ideal
+import com.example.weatherandroidapplication.viewmodel.WeatherRequest.Loading
+import com.example.weatherandroidapplication.viewmodel.WeatherRequest.Success
 import com.example.weatherandroidapplication.viewmodel.WeatherViewModel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collectLatest
-import retrofit2.Call
-import retrofit2.Retrofit
-import retrofit2.http.GET
-import kotlin.reflect.typeOf
-
-sealed class WeatherRequest {
-    object Loading : WeatherRequest()
-    data class Success(val data: WeatherClass) : WeatherRequest()
-    data class Error(val error: String) : WeatherRequest()
-}
-
 
 class MainActivity : ComponentActivity() {
 
     val weatherViewModel by viewModels<WeatherViewModel>()
 
-    var weatherData : WeatherClass = WeatherClass(0, listOf())
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-
 
         setContent {
             LaunchedEffect(Unit) {
@@ -67,7 +45,6 @@ class MainActivity : ComponentActivity() {
 //                appState.value = AppState.LOADING
                 // Perform some async operation
 //                val result = performAsyncOperation()
-
 
                 //appState.value = AppState.DONE(weatherViewModel.weatherResponse)
 
@@ -116,17 +93,11 @@ class MainActivity : ComponentActivity() {
 //                    }
 //                }
 
-
             }
-
-
 
             WeatherAndroidApplicationTheme {
                 // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background
-                ) {
+                Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
                     MainContent()
 
                 }
@@ -134,72 +105,47 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-
-    fun callWeatherApi(): WeatherClass {
+    private fun callWeatherApi() {
+        println("callWeatherApi called")
         weatherViewModel.city = "Mumbai"
         weatherViewModel.country = "IN"
         weatherViewModel.key = "2facb83973524c8e927e726516722a3d"
-        var weatherResultData: WeatherClass
-        weatherResultData = WeatherClass(0, listOf())
-        weatherResultData = weatherViewModel.getWeatherData()
-        println("Weather Result Data is :")
-        println(weatherResultData)
-        println("Weather for chosen city is")
-        if (weatherResultData.count != 0) {
-            println(weatherResultData.data[0].temp)
-            //topCitiesWeatherMutableList.add(weatherRes)
-        } else {
-            println("No data found")
-        }
-
-        return weatherResultData
+        weatherViewModel.getWeatherData()
     }
-
 
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
     @Composable
     fun MainContent() {
-
-        callWeatherApi()
-
         lifecycleScope.launchWhenStarted {
-            weatherViewModel.stateFlow.collectLatest {
-                println("From State Flow :")
-                if(weatherViewModel.weatherResponse.value.count==1){
-                    weatherData = weatherViewModel.weatherResponse.value
-                    //println(weatherData.data)
+            callWeatherApi()
+        }
+        val state: State<WeatherRequest> = weatherViewModel.stateFlow.collectAsState()
+        println("State = $state")
+
+        Scaffold(topBar = {
+            TopAppBar(title = {
+                Text("Weather App", color = Color.White)
+            }, backgroundColor = Color(0xff0f9d58))
+        }, content = {
+            when (state.value) {
+                is Error -> {
+
+                }
+                Ideal -> { }
+                Loading ->  { }
+                is Success -> {
+                    InitialCitiesDisplay((state.value as Success).data)
                 }
             }
-        }
 
-        println("Weather Data Global variable")
-        println(weatherData.data)
-
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = {
-                        Text(
-                            "Weather App",
-                            color = Color.White
-                        )
-                    },
-                    backgroundColor = Color(0xff0f9d58)
-                )
-            },
-            content = { InitialCitiesDisplay() }
-        )
+        })
     }
 
     @Composable
     fun CardWithBorder(city: String, temperature: String, comment: String) {
-        Card(
-            elevation = 10.dp,
-            border = BorderStroke(1.dp, Color.Blue),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(10.dp)
-        ) {
+        Card(elevation = 10.dp, border = BorderStroke(1.dp, Color.Blue), modifier = Modifier
+            .fillMaxWidth()
+            .padding(10.dp)) {
 
             Row() {
                 Column() {
@@ -214,21 +160,20 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
-
         }
     }
 
     @Composable
-    fun InitialCitiesDisplay() {
+    fun InitialCitiesDisplay(weatherData: WeatherClass) {
 
         Column() {
-            if (weatherData.count!=0)
-            CardWithBorder("Mumbai", "$weatherData.data[0].temp" + "\u2103", weatherData.data[0].weather.description)
+            if (weatherData.count != 0) CardWithBorder("Mumbai",
+                "${weatherData.data[0].temp}" + "\u2103",
+                weatherData.data[0].weather.description)
 //            CardWithBorder("Delhi", "30" + "\u2103", "Clear Sunny")
 //            CardWithBorder("Kolkata", "24" + "\u2103", "Rain")
 //            CardWithBorder("Chennai", "24" + "\u2103", "Rain")
         }
-
 
 //    Column() {
 //        Box(
@@ -294,12 +239,13 @@ class MainActivity : ComponentActivity() {
 //    }
     }
 
-
     @Preview(showBackground = true)
     @Composable
     fun DefaultPreview() {
         WeatherAndroidApplicationTheme {
-            InitialCitiesDisplay()
+//            InitialCitiesDisplay(WeatherClass(
+//                0, "", ""
+//            ))
         }
     }
 }
