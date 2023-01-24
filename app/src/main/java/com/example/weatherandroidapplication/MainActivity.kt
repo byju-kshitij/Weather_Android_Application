@@ -46,12 +46,60 @@ class MainActivity : ComponentActivity() {
 
 
         setContent {
-//            LaunchedEffect(Unit) {
-//                val retrofitData = WeatherApi.retrofitService.getWeatherdata("Chennai", country = "IN", key = "9fcb60c4b3984edb99886da0d26b8ee7")
-//                println("Temperature is:")
-//                println(retrofitData.data[0].temp)
+            LaunchedEffect(Unit) {
+                /*val retrofitData = WeatherApi.retrofitService.getWeatherdata("Chennai", country = "IN", key = "9fcb60c4b3984edb99886da0d26b8ee7")
+                println("Temperature is:")
+                println(retrofitData.data[0].temp)*/
+
+                weatherViewModel.city = "Kolkata"
+                weatherViewModel.country = "IN"
+                weatherViewModel.key = "2facb83973524c8e927e726516722a3d"
+                weatherViewModel.getWeatherData()
+
+                println("Weather for chosen city is")
+                if(weatherViewModel.weatherResponse.count!=0){
+                    println(weatherViewModel.weatherResponse.data[0].temp)
+                    var weatherRes = weatherViewModel.weatherResponse
+                    println("Object is")
+                    println(weatherRes)
+                    //topCitiesWeatherMutableList.add(weatherRes)
+                }
+
+                else{
+                    println("No data found")
+                }
+
+
+//                val cityList:List<String> = listOf("Mumbai")
+//                val topCitiesWeatherMutableList = mutableListOf<WeatherClass>()
+//                for (city in cityList){
+//                    weatherViewModel.city = city
+//                    weatherViewModel.country = "IN"
+//                    weatherViewModel.key = "2facb83973524c8e927e726516722a3d"
+//                    weatherViewModel.getWeatherData()
 //
-//            }
+//                    println("Weather for chosen city $city is")
+//                    if(weatherViewModel.weatherResponse.count!=0){
+//                        println(weatherViewModel.weatherResponse.data[0].temp)
+//                        var weatherRes = weatherViewModel.weatherResponse
+//                        println("Object is")
+//                        println(weatherRes)
+//                        topCitiesWeatherMutableList.add(weatherRes)
+//                    }
+//
+//                    else{
+//                        println("No data found")
+//                    }
+//
+//                    //delay(2000)
+//
+//                }
+//
+//                println(topCitiesWeatherMutableList)
+
+
+
+            }
 
 
             WeatherAndroidApplicationTheme {
@@ -60,32 +108,6 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    val cityList:List<String> = listOf("Kolkata","Delhi","Mumbai","Chennai")
-                    val topCitiesWeatherMutableList = mutableListOf<WeatherClass>()
-                    for (city in cityList){
-                        weatherViewModel.city = city
-                        weatherViewModel.country = "IN"
-                        weatherViewModel.key = "9fcb60c4b3984edb99886da0d26b8ee7"
-                        weatherViewModel.getWeatherData()
-
-                        println("Weather for chosen city $weatherViewModel.city is")
-                        if(weatherViewModel.weatherResponse.count!=0){
-                            println(weatherViewModel.weatherResponse.data[0].temp)
-                            var weatherRes = weatherViewModel.weatherResponse
-                            println("Object is")
-                            println(weatherRes)
-                            topCitiesWeatherMutableList.add(weatherRes)
-                        }
-
-                        else{
-                            println("No data found")
-                        }
-
-                        //delay(2000)
-
-                    }
-
-                    println(topCitiesWeatherMutableList)
 
 
 
