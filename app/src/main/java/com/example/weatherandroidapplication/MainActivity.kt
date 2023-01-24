@@ -24,21 +24,33 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
 import com.example.weatherandroidapplication.Models.WeatherClass
 import com.example.weatherandroidapplication.network.WeatherApi
 //import com.example.weatherandroidapplication.network.WeatherApi
 import com.example.weatherandroidapplication.ui.theme.WeatherAndroidApplicationTheme
 import com.example.weatherandroidapplication.viewmodel.WeatherViewModel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.http.GET
 import kotlin.reflect.typeOf
 
+sealed class WeatherRequest {
+    object Loading : WeatherRequest()
+    data class Success(val data: WeatherClass) : WeatherRequest()
+    data class Error(val error: String) : WeatherRequest()
+}
+
 
 class MainActivity : ComponentActivity() {
 
     val weatherViewModel by viewModels<WeatherViewModel>()
+
+    var weatherData : WeatherClass = WeatherClass(0, listOf())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,24 +63,13 @@ class MainActivity : ComponentActivity() {
                 println("Temperature is:")
                 println(retrofitData.data[0].temp)*/
 
-                weatherViewModel.city = "Kolkata"
-                weatherViewModel.country = "IN"
-                weatherViewModel.key = "2facb83973524c8e927e726516722a3d"
-                weatherViewModel.getWeatherData()
+//                var appState: StateFlow<AppState> = MutableStateFlow(AppState.LOADING)
+//                appState.value = AppState.LOADING
+                // Perform some async operation
+//                val result = performAsyncOperation()
 
-                println("Weather for chosen city is")
-                if(weatherViewModel.weatherResponse.count!=0){
-                    println(weatherViewModel.weatherResponse.data[0].temp)
-                    var weatherRes = weatherViewModel.weatherResponse
-                    println("Object is")
-                    println(weatherRes)
-                    //topCitiesWeatherMutableList.add(weatherRes)
-                }
 
-                else{
-                    println("No data found")
-                }
-
+                //appState.value = AppState.DONE(weatherViewModel.weatherResponse)
 
 //                val cityList:List<String> = listOf("Mumbai")
 //                val topCitiesWeatherMutableList = mutableListOf<WeatherClass>()
@@ -97,9 +98,27 @@ class MainActivity : ComponentActivity() {
 //
 //                println(topCitiesWeatherMutableList)
 
+//                callWeatherApi()
+//                val state: WeatherRequest
+//                when (state) {
+//                    is Error -> {
+//                        {
+//
+//                        }
+//                    }
+//                    WeatherRequest.Loading ->  {
+//                        CircleProgress()
+//                    }
+//                    is WeatherRequest.Success -> {
+//                        Card {
+//                            state.data
+//                        }
+//                    }
+//                }
 
 
             }
+
 
 
             WeatherAndroidApplicationTheme {
@@ -108,69 +127,107 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-
-
-
                     MainContent()
+
                 }
             }
         }
     }
-}
 
 
+    fun callWeatherApi(): WeatherClass {
+        weatherViewModel.city = "Mumbai"
+        weatherViewModel.country = "IN"
+        weatherViewModel.key = "2facb83973524c8e927e726516722a3d"
+        var weatherResultData: WeatherClass
+        weatherResultData = WeatherClass(0, listOf())
+        weatherResultData = weatherViewModel.getWeatherData()
+        println("Weather Result Data is :")
+        println(weatherResultData)
+        println("Weather for chosen city is")
+        if (weatherResultData.count != 0) {
+            println(weatherResultData.data[0].temp)
+            //topCitiesWeatherMutableList.add(weatherRes)
+        } else {
+            println("No data found")
+        }
 
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
-@Composable
-fun MainContent(){
-    Scaffold(
-        topBar = {TopAppBar(
-            title = {Text(
-                "Weather App",
-                color = Color.White)},
-            backgroundColor = Color(0xff0f9d58)
-        ) },
-        content = { InitialCitiesDisplay() }
-    )
-}
+        return weatherResultData
+    }
 
-@Composable
-fun CardWithBorder(city:String,temperature:String,comment:String) {
-    Card(
-        elevation = 10.dp,
-        border = BorderStroke(1.dp, Color.Blue),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(10.dp)
-    ) {
 
-        Row() {
-            Column() {
-                Text(text = city, modifier = Modifier.padding(10.dp))
-                Text(text = comment, modifier = Modifier.padding(10.dp))
-                Text(text = temperature, modifier = Modifier.padding(10.dp))
-            }
-            Column(modifier = Modifier.fillMaxWidth(),horizontalAlignment = Alignment.End) {
-                Text(text = "Icon", modifier = Modifier.padding(10.dp))
+    @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+    @Composable
+    fun MainContent() {
 
-                Text(text = "Last updated 10 min ago", modifier = Modifier.padding(10.dp))
+        callWeatherApi()
+
+        lifecycleScope.launchWhenStarted {
+            weatherViewModel.stateFlow.collectLatest {
+                println("From State Flow :")
+                if(weatherViewModel.weatherResponse.value.count==1){
+                    weatherData = weatherViewModel.weatherResponse.value
+                    //println(weatherData.data)
+                }
             }
         }
 
+        println("Weather Data Global variable")
+        println(weatherData.data)
 
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = {
+                        Text(
+                            "Weather App",
+                            color = Color.White
+                        )
+                    },
+                    backgroundColor = Color(0xff0f9d58)
+                )
+            },
+            content = { InitialCitiesDisplay() }
+        )
     }
-}
 
-@Composable
-fun InitialCitiesDisplay() {
+    @Composable
+    fun CardWithBorder(city: String, temperature: String, comment: String) {
+        Card(
+            elevation = 10.dp,
+            border = BorderStroke(1.dp, Color.Blue),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(10.dp)
+        ) {
 
-    Column() {
-        CardWithBorder("Mumbai","25"+"\u2103","Fog")
-        CardWithBorder("Delhi","30"+"\u2103","Clear Sunny")
-        CardWithBorder("Kolkata","24"+"\u2103","Rain")
-        CardWithBorder("Chennai","24"+"\u2103","Rain")
+            Row() {
+                Column() {
+                    Text(text = city, modifier = Modifier.padding(10.dp))
+                    Text(text = comment, modifier = Modifier.padding(10.dp))
+                    Text(text = temperature, modifier = Modifier.padding(10.dp))
+                }
+                Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.End) {
+                    Text(text = "Icon", modifier = Modifier.padding(10.dp))
+
+                    Text(text = "Last updated 10 min ago", modifier = Modifier.padding(10.dp))
+                }
+            }
+
+
+        }
     }
 
+    @Composable
+    fun InitialCitiesDisplay() {
+
+        Column() {
+            if (weatherData.count!=0)
+            CardWithBorder("Mumbai", "$weatherData.data[0].temp" + "\u2103", weatherData.data[0].weather.description)
+//            CardWithBorder("Delhi", "30" + "\u2103", "Clear Sunny")
+//            CardWithBorder("Kolkata", "24" + "\u2103", "Rain")
+//            CardWithBorder("Chennai", "24" + "\u2103", "Rain")
+        }
 
 
 //    Column() {
@@ -235,8 +292,7 @@ fun InitialCitiesDisplay() {
 //
 //
 //    }
-}
-
+    }
 
 
     @Preview(showBackground = true)
@@ -246,3 +302,4 @@ fun InitialCitiesDisplay() {
             InitialCitiesDisplay()
         }
     }
+}
