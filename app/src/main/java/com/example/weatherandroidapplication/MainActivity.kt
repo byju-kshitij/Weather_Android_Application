@@ -1,11 +1,13 @@
 package com.example.weatherandroidapplication
 
 import android.annotation.SuppressLint
+import android.graphics.Paint.Align
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
@@ -15,6 +17,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
@@ -105,9 +108,9 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun callWeatherApi() {
+    private fun callWeatherApi(city:String) {
         println("callWeatherApi called")
-        weatherViewModel.city = "Mumbai"
+        weatherViewModel.city = city
         weatherViewModel.country = "IN"
         weatherViewModel.key = "2facb83973524c8e927e726516722a3d"
         weatherViewModel.getWeatherData()
@@ -116,9 +119,11 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
     @Composable
     fun MainContent() {
+
         lifecycleScope.launchWhenStarted {
-            callWeatherApi()
+            callWeatherApi("Mumbai")
         }
+
         val state: State<WeatherRequest> = weatherViewModel.stateFlow.collectAsState()
         println("State = $state")
 
@@ -130,13 +135,40 @@ class MainActivity : ComponentActivity() {
             when (state.value) {
                 is Error -> {
 
+                    //TODO : Load from Database, if data is present
+
+                    Column() {
+                        Image(painter = painterResource(id = R.drawable.internet_connection_error_icon_no_wi_fi_signal_symbol_vector_online_problem_96450992), contentDescription = "no internet image",
+                        modifier = Modifier
+                            .size(500.dp)
+                            .fillMaxSize()
+                            .wrapContentSize(Alignment.Center))
+                        Text(text = "No Internet Connection !!",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .wrapContentSize(Alignment.Center))
+                        Spacer(modifier = Modifier.height(15.dp))
+
+                        //Add Button , onClick method will call callWeatherApi()
+                        Button(onClick = { callWeatherApi("Mumbai") }, modifier = Modifier
+                            .fillMaxWidth()
+                            .wrapContentSize(Alignment.Center)) {
+                            Text(text = "Retry")
+                        }
+                    }
+
                 }
                 Ideal -> { }
                 Loading ->  {
-                    CircularProgressIndicator(modifier = Modifier.fillMaxSize().wrapContentSize(align = Alignment.Center))
+                    CircularProgressIndicator(modifier = Modifier
+                        .fillMaxSize()
+                        .wrapContentSize(align = Alignment.Center))
                  }
                 is Success -> {
                     println("Fetched Data!!")
+
+
+
                     InitialCitiesDisplay((state.value as Success).data)
                 }
             }
@@ -146,23 +178,38 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun CardWithBorder(city: String, temperature: String, comment: String) {
-        Card(elevation = 10.dp, border = BorderStroke(1.dp, Color.Blue), modifier = Modifier
-            .fillMaxWidth()
-            .padding(10.dp)) {
+        Column() {
+            Card(
+                elevation = 10.dp, border = BorderStroke(1.dp, Color.Blue), modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp)
+            ) {
 
-            Row() {
-                Column() {
-                    Text(text = city, modifier = Modifier.padding(10.dp))
-                    Text(text = comment, modifier = Modifier.padding(10.dp))
-                    Text(text = temperature, modifier = Modifier.padding(10.dp))
-                }
-                Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.End) {
-                    Text(text = "Icon", modifier = Modifier.padding(10.dp))
+                Row() {
+                    Column() {
+                        Text(text = city, modifier = Modifier.padding(10.dp))
+                        Text(text = comment, modifier = Modifier.padding(10.dp))
+                        Text(text = temperature, modifier = Modifier.padding(10.dp))
+                    }
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.End
+                    ) {
+                        Text(text = "Icon", modifier = Modifier.padding(10.dp))
 
-                    Text(text = "Last updated 10 min ago", modifier = Modifier.padding(10.dp))
+                        Text(text = "Last updated 10 min ago", modifier = Modifier.padding(10.dp))
+                    }
                 }
+
             }
 
+            Button(
+                onClick = { callWeatherApi("Mumbai") }, modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentSize(Alignment.Center)
+            ) {
+                Text(text = "Refresh")
+            }
         }
     }
 
