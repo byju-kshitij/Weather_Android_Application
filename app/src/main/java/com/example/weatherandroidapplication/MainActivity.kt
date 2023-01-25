@@ -132,8 +132,11 @@ class MainActivity : ComponentActivity() {
 
                 }
                 Ideal -> { }
-                Loading ->  { }
+                Loading ->  {
+                    CircularProgressIndicator(modifier = Modifier.fillMaxSize().wrapContentSize(align = Alignment.Center))
+                 }
                 is Success -> {
+                    println("Fetched Data!!")
                     InitialCitiesDisplay((state.value as Success).data)
                 }
             }
@@ -167,7 +170,9 @@ class MainActivity : ComponentActivity() {
     fun InitialCitiesDisplay(weatherData: WeatherClass) {
 
         Column() {
-            if (weatherData.count != 0) CardWithBorder("Mumbai",
+            //println("From intital cities display function")
+            //println(weatherData.data)
+            CardWithBorder("Mumbai",
                 "${weatherData.data[0].temp}" + "\u2103",
                 weatherData.data[0].weather.description)
 //            CardWithBorder("Delhi", "30" + "\u2103", "Clear Sunny")

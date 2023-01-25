@@ -35,8 +35,8 @@ class WeatherViewModel : ViewModel() {
             val apiService = WeatherApiService.getInstance()
             try {
                 val retrofitData = WeatherApi.retrofitService.getWeatherdata(city!!, country!!, key!!)
-                delay(3000)
-                weatherResponse.value = WeatherRequest.Success(WeatherClass(1, listOf(Data(""))))
+                delay(2000)
+                weatherResponse.value = WeatherRequest.Success(retrofitData)
                 //
                 println("Temperature from view Model is:")
                 //println(weatherDataResult.data[0].temp)
