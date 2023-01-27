@@ -11,5 +11,5 @@ data class WeatherClass(
     //@field:Json(name = "count")
     val count: Int,
     //@field:Json(name = "data")
-    val data: List<Data>
+    val data: ArrayList<Data>
 )

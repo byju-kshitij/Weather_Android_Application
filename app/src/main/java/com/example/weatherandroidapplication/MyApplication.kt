@@ -21,4 +21,5 @@ class MyApplication : Application() {
 
         config.let { Realm.setDefaultConfiguration(it) }
     }
+
 }

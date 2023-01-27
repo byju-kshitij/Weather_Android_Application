@@ -37,6 +37,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        deleteAllWeatherData()
 
         setContent {
             LaunchedEffect(Unit) {
@@ -116,11 +117,18 @@ class MainActivity : ComponentActivity() {
         weatherViewModel.getWeatherData()
     }
 
+    private fun deleteAllWeatherData() {
+        println("delete Weather Data called")
+        weatherViewModel.deleteAllWeatherData()
+    }
+
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
     @Composable
     fun MainContent() {
 
         lifecycleScope.launchWhenStarted {
+            print("Inside lifeCycle Scope")
+
             callWeatherApi("Mumbai")
         }
 
@@ -136,9 +144,11 @@ class MainActivity : ComponentActivity() {
                 is Error -> {
 
                     //TODO : Load from Database, if data is present
-
+                    if(weatherViewModel.isDataBaseEmpty==false)
+                    InitialCitiesDisplay((state.value as Success).data)
+                    else {
                     Column() {
-                        Image(painter = painterResource(id = R.drawable.internet_connection_error_icon_no_wi_fi_signal_symbol_vector_online_problem_96450992), contentDescription = "no internet image",
+                        Image(painter = painterResource(id = R.drawable.istockphoto_1279827701_612x612), contentDescription = "no internet image",
                         modifier = Modifier
                             .size(500.dp)
                             .fillMaxSize()
@@ -155,6 +165,7 @@ class MainActivity : ComponentActivity() {
                             .wrapContentSize(Alignment.Center)) {
                             Text(text = "Retry")
                         }
+                    }
                     }
 
                 }

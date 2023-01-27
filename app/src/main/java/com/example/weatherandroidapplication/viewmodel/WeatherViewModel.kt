@@ -28,13 +28,15 @@ class WeatherViewModel : ViewModel() {
     private var weatherResponse = MutableStateFlow<WeatherRequest>(Ideal)
     val stateFlow = weatherResponse.asStateFlow()
 
+    var isDataBaseEmpty:Boolean = true
+
     private var realm: Realm = Realm.getDefaultInstance()
 
     //    var errorMessage : String by mutableStateOf("")
     var city: String? = null
     var country: String? = null
     var key: String? = null
-    var weatherDataResult: WeatherClass = WeatherClass(0, listOf())
+    var weatherDataResult: WeatherClass = WeatherClass(0, arrayListOf() )
     fun getWeatherData() {
         println("Inside getWeatherData")
         weatherResponse.value = WeatherRequest.Loading
@@ -56,9 +58,28 @@ class WeatherViewModel : ViewModel() {
                 //TODO : Get from database
                 var history : MutableLiveData<List<WeatherModel>>
                 history = getAllWeather()
-                print("Data from Database")
-                println(history)
-                weatherResponse.value = WeatherRequest.Error(e.message.toString())
+                print("Data from Database ")
+
+                if(history.value?.isEmpty()==true){
+                    weatherResponse.value = WeatherRequest.Error(e.message.toString())
+                }
+                else{
+                    var lastUpdatedWeatherModelObject : WeatherModel = history.value!![history.value!!.count()-1]
+                    var latestTemp:Int = lastUpdatedWeatherModelObject.temp
+                    var latestDescription:String = lastUpdatedWeatherModelObject.description!!
+                    var latestWeatherObject : WeatherClass = WeatherClass(1, arrayListOf())
+                    latestWeatherObject.data.add(Data())
+                    latestWeatherObject.data[0].temp = latestTemp
+                    latestWeatherObject.data[0].weather.description = latestDescription
+                    weatherResponse.value = WeatherRequest.Success(latestWeatherObject)
+                    for (item in history.value!!){
+                        println(item)
+                    }
+                }
+
+
+                //weatherResponse.value = WeatherRequest.Error(e.message.toString())
+
             }
         }
 
@@ -66,13 +87,20 @@ class WeatherViewModel : ViewModel() {
         println(weatherDataResult.data)
     }
 
-    private fun getAllWeather(): MutableLiveData<List<WeatherModel>> {
+    fun deleteAllWeatherData() {
+        realm.executeTransaction { r: Realm ->
+            r.delete(WeatherModel::class.java)
+        }
+    }
+
+    fun getAllWeather(): MutableLiveData<List<WeatherModel>> {
         val list = MutableLiveData<List<WeatherModel>>()
         val weathers = realm.where(WeatherModel::class.java).findAll()
         list.value = weathers?.subList(0, weathers.size)
         return list
     }
     fun addWeatherToDB(temp: Int, weatherDescription: String,city:String) {
+        isDataBaseEmpty = false
         realm.executeTransaction { r: Realm ->
             val weather = r.createObject(WeatherModel::class.java, UUID.randomUUID().toString())
             weather.temp = temp!!
