@@ -20,6 +20,8 @@ class MyApplication : Application() {
             .allowWritesOnUiThread(true).build()
 
         config.let { Realm.setDefaultConfiguration(it) }
+
+
     }
 
 }
