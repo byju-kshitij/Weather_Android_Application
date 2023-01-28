@@ -199,8 +199,7 @@ class MainActivity : ComponentActivity() {
     fun CardWithBorder(city: String, temperature: Int, comment: String) {
         Column() {
             Card(
-                elevation = 2.dp, border = BorderStroke(1.dp, Color.Blue), modifier = Modifier
-                    .fillMaxWidth()
+                elevation = 10.dp, border = BorderStroke(1.dp, Color.Blue), modifier = Modifier
                     .padding(10.dp)
             ) {
 
@@ -241,7 +240,6 @@ class MainActivity : ComponentActivity() {
     fun InitialCitiesDisplay(weatherData: ArrayList<WeatherClass>) {
 
         print("From  Main Vieww... Weather Data List is ")
-
         for(item in weatherData){
             println(item)
         }
