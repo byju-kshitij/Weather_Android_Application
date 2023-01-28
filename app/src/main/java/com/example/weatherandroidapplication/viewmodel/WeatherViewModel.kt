@@ -4,6 +4,7 @@ import WeatherX
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.weatherandroidapplication.Repository.RepositoryClass
 import com.example.weatherandroidapplication.WeatherModel
 import com.example.weatherandroidapplication.models.Data
 import com.example.weatherandroidapplication.models.WeatherClass
@@ -32,6 +33,8 @@ class WeatherViewModel : ViewModel() {
 
     private var realm: Realm = Realm.getDefaultInstance()
 
+    private var RepoObj = RepositoryClass()
+
     //    var errorMessage : String by mutableStateOf("")
     var city: String? = null
     var country: String? = null
@@ -43,13 +46,13 @@ class WeatherViewModel : ViewModel() {
         viewModelScope.launch {
             val apiService = WeatherApiService.getInstance()
             try {
-                val retrofitData = WeatherApi.retrofitService.getWeatherdata(city!!, country!!, key!!)
+                val retrofitData = RepoObj.getFromNetwokCall()
                 //TODO : Add in the database
 
                 //delay(2000)
                 weatherResponse.value = WeatherRequest.Success(retrofitData)
 
-                addWeatherToDB(retrofitData.data[0].temp,retrofitData.data[0].weather.description,city!!)
+                RepoObj.adddToDB(retrofitData.data[0].temp,retrofitData.data[0].weather.description,city!!)
                 //
                 println("Temperature from view Model is:")
                 //println(weatherDataResult.data[0].temp)
@@ -57,7 +60,7 @@ class WeatherViewModel : ViewModel() {
                 // if api fails
                 //TODO : Get from database
                 var history : MutableLiveData<List<WeatherModel>>
-                history = getAllWeather()
+                history = RepoObj.getFromDB()
                 print("Data from Database ")
 
                 if(history.value?.isEmpty()==true){
@@ -87,27 +90,27 @@ class WeatherViewModel : ViewModel() {
         println(weatherDataResult.data)
     }
 
-    fun deleteAllWeatherData() {
-        realm.executeTransaction { r: Realm ->
-            r.delete(WeatherModel::class.java)
-        }
-    }
-
-    fun getAllWeather(): MutableLiveData<List<WeatherModel>> {
-        val list = MutableLiveData<List<WeatherModel>>()
-        val weathers = realm.where(WeatherModel::class.java).findAll()
-        list.value = weathers?.subList(0, weathers.size)
-        return list
-    }
-    fun addWeatherToDB(temp: Int, weatherDescription: String,city:String) {
-        isDataBaseEmpty = false
-        realm.executeTransaction { r: Realm ->
-            val weather = r.createObject(WeatherModel::class.java, UUID.randomUUID().toString())
-            weather.temp = temp!!
-            weather.city = city!!
-            weather.description = weatherDescription!!
-            realm.insertOrUpdate(weather)
-        }
-    }
+//    fun deleteAllWeatherData() {
+//        realm.executeTransaction { r: Realm ->
+//            r.delete(WeatherModel::class.java)
+//        }
+//    }
+//
+//    fun getAllWeather(): MutableLiveData<List<WeatherModel>> {
+//        val list = MutableLiveData<List<WeatherModel>>()
+//        val weathers = realm.where(WeatherModel::class.java).findAll()
+//        list.value = weathers?.subList(0, weathers.size)
+//        return list
+//    }
+//    fun addWeatherToDB(temp: Int, weatherDescription: String,city:String) {
+//        isDataBaseEmpty = false
+//        realm.executeTransaction { r: Realm ->
+//            val weather = r.createObject(WeatherModel::class.java, UUID.randomUUID().toString())
+//            weather.temp = temp!!
+//            weather.city = city!!
+//            weather.description = weatherDescription!!
+//            realm.insertOrUpdate(weather)
+//        }
+//    }
 
 }

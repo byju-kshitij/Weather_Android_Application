@@ -21,6 +21,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
+import com.example.weatherandroidapplication.Repository.RepositoryClass
 import com.example.weatherandroidapplication.models.WeatherClass
 //import com.example.weatherandroidapplication.network.WeatherApi
 import com.example.weatherandroidapplication.ui.theme.WeatherAndroidApplicationTheme
@@ -34,6 +35,8 @@ import com.example.weatherandroidapplication.viewmodel.WeatherViewModel
 class MainActivity : ComponentActivity() {
 
     val weatherViewModel by viewModels<WeatherViewModel>()
+
+    val RepoObj = RepositoryClass()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -119,7 +122,7 @@ class MainActivity : ComponentActivity() {
 
     private fun deleteAllWeatherData() {
         println("delete Weather Data called")
-        weatherViewModel.deleteAllWeatherData()
+        RepoObj.deleteAllDBData()
     }
 
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
