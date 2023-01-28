@@ -12,7 +12,7 @@ class RepositoryClass {
 
     val daoObj = DAO()
 
-    suspend fun getFromNetwokCall() : WeatherClass{
+    suspend fun getFromNetwokCall() : ArrayList<WeatherClass>{
 
         return networkObj.getWeatherInfo()
 

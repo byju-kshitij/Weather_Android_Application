@@ -6,9 +6,14 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.annotation.WorkerThread
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -40,7 +45,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        deleteAllWeatherData()
+        //deleteAllWeatherData()
 
         setContent {
             LaunchedEffect(Unit) {
@@ -120,10 +125,10 @@ class MainActivity : ComponentActivity() {
         weatherViewModel.getWeatherData()
     }
 
-    private fun deleteAllWeatherData() {
-        println("delete Weather Data called")
-        RepoObj.deleteAllDBData()
-    }
+//    private fun deleteAllWeatherData() {
+//        println("delete Weather Data called")
+//        RepoObj.deleteAllDBData()
+//    }
 
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
     @Composable
@@ -191,10 +196,10 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun CardWithBorder(city: String, temperature: String, comment: String) {
+    fun CardWithBorder(city: String, temperature: Int, comment: String) {
         Column() {
             Card(
-                elevation = 10.dp, border = BorderStroke(1.dp, Color.Blue), modifier = Modifier
+                elevation = 2.dp, border = BorderStroke(1.dp, Color.Blue), modifier = Modifier
                     .fillMaxWidth()
                     .padding(10.dp)
             ) {
@@ -203,7 +208,7 @@ class MainActivity : ComponentActivity() {
                     Column() {
                         Text(text = city, modifier = Modifier.padding(10.dp))
                         Text(text = comment, modifier = Modifier.padding(10.dp))
-                        Text(text = temperature, modifier = Modifier.padding(10.dp))
+                        Text(text = temperature.toString()+ "\u2103", modifier = Modifier.padding(10.dp))
                     }
                     Column(
                         modifier = Modifier.fillMaxWidth(),
@@ -217,6 +222,31 @@ class MainActivity : ComponentActivity() {
 
             }
 
+
+        }
+    }
+
+    @Composable
+    fun AddCard(weatherOb:WeatherClass) {
+        CardWithBorder(city = weatherOb.data[0].city_name, temperature = weatherOb.data[0].temp, comment = weatherOb.data[0].weather.description)
+    }
+
+
+    @Composable
+    fun InitialCitiesDisplay(weatherData: ArrayList<WeatherClass>) {
+
+        print("From  Main Vieww... Weather Data List is ")
+
+        for(item in weatherData){
+            println(item)
+        }
+
+        Column() {
+            LazyColumn {
+                itemsIndexed(items = weatherData) { index, item ->
+                    AddCard(weatherOb = item)
+                }
+            }
             Button(
                 onClick = { callWeatherApi("Mumbai") }, modifier = Modifier
                     .fillMaxWidth()
@@ -225,21 +255,45 @@ class MainActivity : ComponentActivity() {
                 Text(text = "Refresh")
             }
         }
-    }
 
-    @Composable
-    fun InitialCitiesDisplay(weatherData: WeatherClass) {
 
-        Column() {
-            //println("From intital cities display function")
-            //println(weatherData.data)
-            CardWithBorder("Mumbai",
-                "${weatherData.data[0].temp}" + "\u2103",
-                weatherData.data[0].weather.description)
-//            CardWithBorder("Delhi", "30" + "\u2103", "Clear Sunny")
-//            CardWithBorder("Kolkata", "24" + "\u2103", "Rain")
-//            CardWithBorder("Chennai", "24" + "\u2103", "Rain")
         }
+
+
+
+
+
+//        Column() {
+//
+//            CardWithBorder("Mumbai",
+//                "${weatherData[0].data[0].temp}" + "\u2103",
+//                weatherData[0].data[0].weather.description)
+//
+//
+//            CardWithBorder("Delhi",
+//                "${weatherData[1].data[0].temp}" + "\u2103",
+//                weatherData[1].data[0].weather.description)
+//
+//
+//
+//            CardWithBorder("Kolkata",
+//                "${weatherData[2].data[0].temp}" + "\u2103",
+//                weatherData[2].data[0].weather.description)
+//
+//
+//
+//            CardWithBorder("Chnnai",
+//                "${weatherData[3].data[0].temp}" + "\u2103",
+//                weatherData[3].data[0].weather.description)
+//
+//            Button(
+//                onClick = { callWeatherApi("Mumbai") }, modifier = Modifier
+//                    .fillMaxWidth()
+//                    .wrapContentSize(Alignment.Center)
+//            ) {
+//                Text(text = "Refresh")
+//            }
+//        }
 
 //    Column() {
 //        Box(
@@ -254,7 +308,7 @@ class MainActivity : ComponentActivity() {
 //                .wrapContentHeight()
 //                .background(color = Color.Magenta)
 //                .border(border = BorderStroke(width = 1.dp, Color.LightGray))
-//        ) {
+        //) {
 //            Column() {
 //                Text("Mumbai")
 //                Text("Fog")
@@ -303,7 +357,7 @@ class MainActivity : ComponentActivity() {
 //
 //
 //    }
-    }
+
 
     @Preview(showBackground = true)
     @Composable

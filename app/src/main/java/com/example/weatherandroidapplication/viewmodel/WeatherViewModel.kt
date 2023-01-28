@@ -17,11 +17,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.util.*
+import kotlin.collections.ArrayList
 
 sealed class WeatherRequest {
     object Ideal : WeatherRequest()
     object Loading : WeatherRequest()
-    data class Success(val data: WeatherClass) : WeatherRequest() // val data : List<WeatherClass> for 4 cities, use Lazy Column for list
+    data class Success(val data: ArrayList<WeatherClass>) : WeatherRequest() // val data : List<WeatherClass> for 4 cities, use Lazy Column for list
     data class Error(val error: String) : WeatherRequest()
 }
 
@@ -46,13 +47,14 @@ class WeatherViewModel : ViewModel() {
         viewModelScope.launch {
             val apiService = WeatherApiService.getInstance()
             try {
-                val retrofitData = RepoObj.getFromNetwokCall()
+                var WeatherObjectList = ArrayList<WeatherClass>()
+                WeatherObjectList = RepoObj.getFromNetwokCall()
                 //TODO : Add in the database
 
                 //delay(2000)
-                weatherResponse.value = WeatherRequest.Success(retrofitData)
+                weatherResponse.value = WeatherRequest.Success(WeatherObjectList)
 
-                RepoObj.adddToDB(retrofitData.data[0].temp,retrofitData.data[0].weather.description,city!!)
+                //RepoObj.adddToDB(retrofitData.data[0].temp,retrofitData.data[0].weather.description,city!!)
                 //
                 println("Temperature from view Model is:")
                 //println(weatherDataResult.data[0].temp)
@@ -67,17 +69,17 @@ class WeatherViewModel : ViewModel() {
                     weatherResponse.value = WeatherRequest.Error(e.message.toString())
                 }
                 else{
-                    var lastUpdatedWeatherModelObject : WeatherModel = history.value!![history.value!!.count()-1]
-                    var latestTemp:Int = lastUpdatedWeatherModelObject.temp
-                    var latestDescription:String = lastUpdatedWeatherModelObject.description!!
-                    var latestWeatherObject : WeatherClass = WeatherClass(1, arrayListOf())
-                    latestWeatherObject.data.add(Data())
-                    latestWeatherObject.data[0].temp = latestTemp
-                    latestWeatherObject.data[0].weather.description = latestDescription
-                    weatherResponse.value = WeatherRequest.Success(latestWeatherObject)
-                    for (item in history.value!!){
-                        println(item)
-                    }
+//                    var lastUpdatedWeatherModelObject : WeatherModel = history.value!![history.value!!.count()-1]
+//                    var latestTemp:Int = lastUpdatedWeatherModelObject.temp
+//                    var latestDescription:String = lastUpdatedWeatherModelObject.description!!
+//                    var latestWeatherObject : WeatherClass = WeatherClass(1, arrayListOf())
+//                    latestWeatherObject.data.add(Data())
+//                    latestWeatherObject.data[0].temp = latestTemp
+//                    latestWeatherObject.data[0].weather.description = latestDescription
+//                    weatherResponse.value = WeatherRequest.Success(latestWeatherObject)
+//                    for (item in history.value!!){
+//                        println(item)
+//                    }
                 }
 
 

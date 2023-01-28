@@ -6,7 +6,13 @@ class NetworkOps {
     private val city = "Mumbai"
     private val country = "IN"
     private val key = "2facb83973524c8e927e726516722a3d"
-    suspend fun getWeatherInfo():WeatherClass{
-        return WeatherApi.retrofitService.getWeatherdata(city!!, country!!, key!!)
+    suspend fun getWeatherInfo():ArrayList<WeatherClass>{
+        val cityList:List<String> = listOf("Mumbai","Delhi","Kolkata","Chennai")
+        var WeatherObjectList = ArrayList<WeatherClass>()
+        for (city in cityList){
+            WeatherObjectList.add(WeatherApi.retrofitService.getWeatherdata(city!!, country!!, key!!))
+        }
+
+        return WeatherObjectList
     }
 }
