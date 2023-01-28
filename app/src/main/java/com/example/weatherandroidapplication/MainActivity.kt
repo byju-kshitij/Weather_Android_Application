@@ -214,9 +214,14 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier.fillMaxWidth(),
                         horizontalAlignment = Alignment.End
                     ) {
-                        Text(text = "Icon", modifier = Modifier.padding(10.dp))
+                        //Text(text = "Icon", modifier = Modifier.padding(10.dp))
+                        Image(painter = painterResource(id = R.drawable.icons8_rain_cloud_48), contentDescription = "icon",
+                            modifier = Modifier
+                                .size(40.dp))
 
-                        Text(text = "Last updated 10 min ago", modifier = Modifier.padding(10.dp))
+                        Spacer(modifier = Modifier.height(40.dp))
+
+                                Text(text = "Last updated 10 min ago", modifier = Modifier.padding(10.dp))
                     }
                 }
 
