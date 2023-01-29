@@ -3,6 +3,7 @@ package com.example.weatherandroidapplication
 import android.annotation.SuppressLint
 import android.graphics.Paint.Align
 import android.os.Bundle
+import android.widget.Space
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -153,19 +154,31 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun CardWithBorder(city: String, temperature: Int, comment: String,navController: NavController) {
+    fun CardWithBorder(weatherOb: WeatherClass,navController: NavController) {
         Column() {
             Card(
                 elevation = 10.dp, border = BorderStroke(1.dp, Color.Blue), modifier = Modifier
                     .padding(10.dp)
-                    .clickable { navController.navigate(Screen.DetailScreen.withArgs(temperature.toString())) }
+                    .clickable {
+                        navController.navigate(
+                            Screen.DetailScreen.withArgs(
+                                weatherOb.data[0].sunrise,
+                                weatherOb.data[0].sunset,
+                                weatherOb.data[0].rh.toString(),
+                                weatherOb.data[0].vis.toString(),
+                                weatherOb.data[0].clouds.toString(),
+                                weatherOb.data[0].wind_spd.toString(),
+                                weatherOb.data[0].pres.toString()
+                            )
+                        )
+                    }
             ) {
 
                 Row() {
                     Column() {
-                        Text(text = city, modifier = Modifier.padding(10.dp))
-                        Text(text = comment, modifier = Modifier.padding(10.dp))
-                        Text(text = temperature.toString()+ "\u2103", modifier = Modifier.padding(10.dp))
+                        Text(text = weatherOb.data[0].city_name, modifier = Modifier.padding(10.dp))
+                        Text(text = weatherOb.data[0].weather.description, modifier = Modifier.padding(10.dp))
+                        Text(text = weatherOb.data[0].temp.toString()+ "\u2103", modifier = Modifier.padding(10.dp))
                     }
                     Column(
                         modifier = Modifier.fillMaxWidth(),
@@ -190,7 +203,7 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun AddCard(weatherOb:WeatherClass,navController: NavController) {
-        CardWithBorder(city = weatherOb.data[0].city_name, temperature = weatherOb.data[0].temp, comment = weatherOb.data[0].weather.description, navController = navController)
+        CardWithBorder(weatherOb, navController = navController)
     }
 
 
@@ -229,15 +242,35 @@ class MainActivity : ComponentActivity() {
                 MainScreen(navController = navController)
             }
 
-            composable(route = Screen.DetailScreen.route + "/{tempStr}",
+            composable(route = Screen.DetailScreen.route + "/{sunrise}/{sunset}/{humidity}/{visibility}/{clouds}/{winds}/{pressure}",
                 arguments = listOf(
-                navArgument("tempStr"){
+                navArgument("sunrise"){
                     type = NavType.StringType
-                }
+                },
+                    navArgument("sunset"){
+                        type = NavType.StringType
+                    },
+                    navArgument("humidity"){
+                        type = NavType.StringType
+                    },
+                    navArgument("visibility"){
+                        type = NavType.StringType
+                    } ,
+                            navArgument("clouds"){
+                        type = androidx.navigation.NavType.StringType
+                    },
+                            navArgument("winds"){
+                        type = androidx.navigation.NavType.StringType
+                    },
+                            navArgument("pressure"){
+                        type = androidx.navigation.NavType.StringType
+                    }
             )
             ){
-                entry ->
-                entry.arguments?.getString("tempStr")?.let { DetailScreen(tempString = it) }
+//                entry ->
+//                entry.arguments?.getString("tempStr")?.let { DetailScreen(tempString = it) }
+
+                entry -> DetailScreen(sunrise = entry.arguments?.getString("sunrise")!!, sunset = entry.arguments?.getString("sunset")!! , humidity = entry.arguments?.getString("humidity")!! , visibility = entry.arguments?.getString("visibility")!!, clouds = entry.arguments?.getString("clouds")!!, winds = entry.arguments?.getString("winds")!!, pressure = entry.arguments?.getString("pressure")!! )
             }
 
         }
@@ -251,10 +284,29 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun DetailScreen(tempString:String){
-        Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()){
-            Text(text = "Temperature is ${tempString}")
+    fun DetailScreen(sunrise:String,sunset:String,humidity:String,visibility:String,clouds:String,winds:String,pressure:String){
+        //Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()){
+        Column() {
+            Text(text = "GMT Sunrise time is ${sunrise}")
+            Spacer(modifier = Modifier.height(15.dp))
+            Text(text = "GMT Sunset time is ${sunset}")
+//            Spacer(modifier = Modifier.height(15.dp))
+//            Text(text = "Precipitation in mm ${precipitation}")
+            Spacer(modifier = Modifier.height(15.dp))
+            Text(text = "Humidity Percentage time is ${humidity}")
+            Spacer(modifier = Modifier.height(15.dp))
+            Text(text = "Visibility Percentage is ${visibility}")
+            Spacer(modifier = Modifier.height(15.dp))
+            Text(text = "Clouds Percentage is ${clouds}")
+            Spacer(modifier = Modifier.height(15.dp))
+            Text(text = "Wind Percentage is ${winds}")
+            Spacer(modifier = Modifier.height(15.dp))
+            Text(text = "Pressure is ${pressure}")
+
+
         }
+
+        //}
     }
 
 
