@@ -1,6 +1,7 @@
 package com.example.weatherandroidapplication.viewmodel
 
 import WeatherX
+import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -12,6 +13,7 @@ import com.example.weatherandroidapplication.network.WeatherApi
 import com.example.weatherandroidapplication.network.WeatherApiService
 import com.example.weatherandroidapplication.viewmodel.WeatherRequest.Ideal
 import io.realm.Realm
+import io.realm.Realm.getApplicationContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -54,7 +56,7 @@ class WeatherViewModel : ViewModel() {
                 //delay(2000)
                 weatherResponse.value = WeatherRequest.Success(WeatherObjectList)
 
-                //RepoObj.adddToDB(retrofitData.data[0].temp,retrofitData.data[0].weather.description,city!!)
+                RepoObj.adddToDB(WeatherObjectList)
                 //
                 println("Temperature from view Model is:")
                 //println(weatherDataResult.data[0].temp)
@@ -63,12 +65,35 @@ class WeatherViewModel : ViewModel() {
                 //TODO : Get from database
                 var history : MutableLiveData<List<WeatherModel>>
                 history = RepoObj.getFromDB()
+
+
                 print("Data from Database ")
 
                 if(history.value?.isEmpty()==true){
                     weatherResponse.value = WeatherRequest.Error(e.message.toString())
                 }
                 else{
+                    Toast.makeText(getApplicationContext(),"No Internet !! Fetched From DB",Toast.LENGTH_SHORT).show();
+                    var sizeOfWeatherList:Int = history.value!!.count()
+
+                    var WeatherObjectList = ArrayList<WeatherClass>()
+                    for(i in sizeOfWeatherList-4..sizeOfWeatherList-1){
+                        var lastUpdatedWeatherModelObject : WeatherModel = history.value!![i]
+
+                        var latestTemp:Int = lastUpdatedWeatherModelObject.temp
+                        var latestDescription:String = lastUpdatedWeatherModelObject.description!!
+                        var latestCity:String = lastUpdatedWeatherModelObject.city!!
+                        var latestWeatherObject : WeatherClass = WeatherClass(1, arrayListOf())
+                        latestWeatherObject.data.add(Data())
+                        latestWeatherObject.data[0].temp = latestTemp
+                        latestWeatherObject.data[0].weather.description = latestDescription
+                        latestWeatherObject.data[0].city_name = latestCity
+
+                        WeatherObjectList.add(latestWeatherObject)
+
+                    }
+
+                    weatherResponse.value = WeatherRequest.Success(WeatherObjectList)
 //                    var lastUpdatedWeatherModelObject : WeatherModel = history.value!![history.value!!.count()-1]
 //                    var latestTemp:Int = lastUpdatedWeatherModelObject.temp
 //                    var latestDescription:String = lastUpdatedWeatherModelObject.description!!

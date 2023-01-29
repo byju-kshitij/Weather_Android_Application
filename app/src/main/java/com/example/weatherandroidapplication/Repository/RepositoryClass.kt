@@ -22,8 +22,13 @@ class RepositoryClass {
         return daoObj.getAllWeather()
     }
 
-    fun adddToDB(temp: Int, weatherDescription: String,city:String){
-        daoObj.addWeatherToDB(temp,weatherDescription,city)
+    fun adddToDB(WeatherObjectList:ArrayList<WeatherClass>){
+
+        for(item in WeatherObjectList){
+            daoObj.addWeatherToDB(item.data[0].temp,item.data[0].weather.description,item.data[0].city_name)
+                //daoObj.addWeatherToDB(temp,weatherDescription,city)
+        }
+
     }
 
     fun deleteAllDBData(){

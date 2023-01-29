@@ -1,4 +1,5 @@
 package com.example.weatherandroidapplication
+import com.example.weatherandroidapplication.models.WeatherClass
 import io.realm.RealmModel
 import io.realm.annotations.PrimaryKey
 import io.realm.annotations.RealmClass
@@ -13,4 +14,5 @@ open class WeatherModel : RealmModel {
     var temp:Int = 0
     @Required
     var description:String? = ""
+
 }

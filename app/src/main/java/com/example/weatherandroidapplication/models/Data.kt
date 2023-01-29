@@ -5,7 +5,7 @@ import WeatherX
 data class Data(
     val app_temp2: Double = 0.0,
     val aqi: Int = 0,
-    val city_name: String = "",
+    var city_name: String = "",
     val clouds: Int = 0,
     val country_code: String = "",
     val datetime: String = "",
