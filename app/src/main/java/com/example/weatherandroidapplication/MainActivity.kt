@@ -7,10 +7,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.annotation.WorkerThread
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -26,6 +23,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavController
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.weatherandroidapplication.Repository.RepositoryClass
 import com.example.weatherandroidapplication.models.WeatherClass
 //import com.example.weatherandroidapplication.network.WeatherApi
@@ -36,6 +39,14 @@ import com.example.weatherandroidapplication.viewmodel.WeatherRequest.Ideal
 import com.example.weatherandroidapplication.viewmodel.WeatherRequest.Loading
 import com.example.weatherandroidapplication.viewmodel.WeatherRequest.Success
 import com.example.weatherandroidapplication.viewmodel.WeatherViewModel
+
+
+
+
+
+
+
+
 
 class MainActivity : ComponentActivity() {
 
@@ -49,68 +60,13 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             LaunchedEffect(Unit) {
-                /*val retrofitData = WeatherApi.retrofitService.getWeatherdata("Chennai", country = "IN", key = "9fcb60c4b3984edb99886da0d26b8ee7")
-                println("Temperature is:")
-                println(retrofitData.data[0].temp)*/
-
-//                var appState: StateFlow<AppState> = MutableStateFlow(AppState.LOADING)
-//                appState.value = AppState.LOADING
-                // Perform some async operation
-//                val result = performAsyncOperation()
-
-                //appState.value = AppState.DONE(weatherViewModel.weatherResponse)
-
-//                val cityList:List<String> = listOf("Mumbai")
-//                val topCitiesWeatherMutableList = mutableListOf<WeatherClass>()
-//                for (city in cityList){
-//                    weatherViewModel.city = city
-//                    weatherViewModel.country = "IN"
-//                    weatherViewModel.key = "2facb83973524c8e927e726516722a3d"
-//                    weatherViewModel.getWeatherData()
-//
-//                    println("Weather for chosen city $city is")
-//                    if(weatherViewModel.weatherResponse.count!=0){
-//                        println(weatherViewModel.weatherResponse.data[0].temp)
-//                        var weatherRes = weatherViewModel.weatherResponse
-//                        println("Object is")
-//                        println(weatherRes)
-//                        topCitiesWeatherMutableList.add(weatherRes)
-//                    }
-//
-//                    else{
-//                        println("No data found")
-//                    }
-//
-//                    //delay(2000)
-//
-//                }
-//
-//                println(topCitiesWeatherMutableList)
-
-//                callWeatherApi()
-//                val state: WeatherRequest
-//                when (state) {
-//                    is Error -> {
-//                        {
-//
-//                        }
-//                    }
-//                    WeatherRequest.Loading ->  {
-//                        CircleProgress()
-//                    }
-//                    is WeatherRequest.Success -> {
-//                        Card {
-//                            state.data
-//                        }
-//                    }
-//                }
 
             }
 
             WeatherAndroidApplicationTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
-                    MainContent()
+                    Navigation()
 
                 }
             }
@@ -132,7 +88,7 @@ class MainActivity : ComponentActivity() {
 
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
     @Composable
-    fun MainContent() {
+    fun MainContent(navController: NavController) {
 
         lifecycleScope.launchWhenStarted {
             print("Inside lifeCycle Scope")
@@ -142,6 +98,7 @@ class MainActivity : ComponentActivity() {
 
         val state: State<WeatherRequest> = weatherViewModel.stateFlow.collectAsState()
         println("State = $state")
+
 
         Scaffold(topBar = {
             TopAppBar(title = {
@@ -153,7 +110,7 @@ class MainActivity : ComponentActivity() {
 
                     //TODO : Load from Database, if data is present
                     if(weatherViewModel.isDataBaseEmpty==false)
-                    InitialCitiesDisplay((state.value as Success).data)
+                    InitialCitiesDisplay((state.value as Success).data, navController = navController)
                     else {
                     Column() {
                         Image(painter = painterResource(id = R.drawable.istockphoto_1279827701_612x612), contentDescription = "no internet image",
@@ -188,7 +145,7 @@ class MainActivity : ComponentActivity() {
 
 
 
-                    InitialCitiesDisplay((state.value as Success).data)
+                    InitialCitiesDisplay((state.value as Success).data,navController = navController)
                 }
             }
 
@@ -196,11 +153,12 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun CardWithBorder(city: String, temperature: Int, comment: String) {
+    fun CardWithBorder(city: String, temperature: Int, comment: String,navController: NavController) {
         Column() {
             Card(
                 elevation = 10.dp, border = BorderStroke(1.dp, Color.Blue), modifier = Modifier
                     .padding(10.dp)
+                    .clickable { navController.navigate(Screen.DetailScreen.withArgs(temperature.toString())) }
             ) {
 
                 Row() {
@@ -231,13 +189,13 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun AddCard(weatherOb:WeatherClass) {
-        CardWithBorder(city = weatherOb.data[0].city_name, temperature = weatherOb.data[0].temp, comment = weatherOb.data[0].weather.description)
+    fun AddCard(weatherOb:WeatherClass,navController: NavController) {
+        CardWithBorder(city = weatherOb.data[0].city_name, temperature = weatherOb.data[0].temp, comment = weatherOb.data[0].weather.description, navController = navController)
     }
 
 
     @Composable
-    fun InitialCitiesDisplay(weatherData: ArrayList<WeatherClass>) {
+    fun InitialCitiesDisplay(weatherData: ArrayList<WeatherClass>,navController: NavController) {
 
         print("From  Main Vieww... Weather Data List is ")
         for(item in weatherData){
@@ -247,7 +205,7 @@ class MainActivity : ComponentActivity() {
         Column() {
             LazyColumn {
                 itemsIndexed(items = weatherData) { index, item ->
-                    AddCard(weatherOb = item)
+                    AddCard(weatherOb = item,navController)
                 }
             }
             Button(
@@ -262,104 +220,43 @@ class MainActivity : ComponentActivity() {
 
         }
 
+    @Composable
+    fun Navigation () {
 
+        val navController = rememberNavController()
+        NavHost(navController = navController, startDestination = Screen.MainScreen.route  ){
+            composable(Screen.MainScreen.route){
+                MainScreen(navController = navController)
+            }
 
+            composable(route = Screen.DetailScreen.route + "/{tempStr}",
+                arguments = listOf(
+                navArgument("tempStr"){
+                    type = NavType.StringType
+                }
+            )
+            ){
+                entry ->
+                entry.arguments?.getString("tempStr")?.let { DetailScreen(tempString = it) }
+            }
 
+        }
 
-//        Column() {
-//
-//            CardWithBorder("Mumbai",
-//                "${weatherData[0].data[0].temp}" + "\u2103",
-//                weatherData[0].data[0].weather.description)
-//
-//
-//            CardWithBorder("Delhi",
-//                "${weatherData[1].data[0].temp}" + "\u2103",
-//                weatherData[1].data[0].weather.description)
-//
-//
-//
-//            CardWithBorder("Kolkata",
-//                "${weatherData[2].data[0].temp}" + "\u2103",
-//                weatherData[2].data[0].weather.description)
-//
-//
-//
-//            CardWithBorder("Chnnai",
-//                "${weatherData[3].data[0].temp}" + "\u2103",
-//                weatherData[3].data[0].weather.description)
-//
-//            Button(
-//                onClick = { callWeatherApi("Mumbai") }, modifier = Modifier
-//                    .fillMaxWidth()
-//                    .wrapContentSize(Alignment.Center)
-//            ) {
-//                Text(text = "Refresh")
-//            }
-//        }
+    }
 
-//    Column() {
-//        Box(
-//            modifier = Modifier.border(BorderStroke(2.dp, Color.Red))
-//        )
-//
-//        Row(
-//            modifier = Modifier
-//                .weight(1f)
-//                .fillMaxHeight()
-//                .fillMaxWidth()
-//                .wrapContentHeight()
-//                .background(color = Color.Magenta)
-//                .border(border = BorderStroke(width = 1.dp, Color.LightGray))
-        //) {
-//            Column() {
-//                Text("Mumbai")
-//                Text("Fog")
-//                Text("25 C")
-//
-//            }
-//
-//            Column(modifier = Modifier.fillMaxWidth(),
-//                horizontalAlignment = Alignment.End) {
-//                Text("Icon")
-//                Text("Last updated 10 min ago")
-//
-//            }
-//
-//        }
-//
-//        Row(
-//            modifier = Modifier
-//                .weight(1f)
-//                .fillMaxWidth()
-//                .wrapContentHeight()
-//                .background(color = Color.Red)
-//        ) {
-//            Column() {
-//                Text("Delhi")
-//                Text("Clear Sunny")
-//                Text("30 C")
-//
-//            }
-//        }
-//
-//        Row(
-//            modifier = Modifier
-//                .weight(1f)
-//                .fillMaxWidth()
-//                .wrapContentHeight()
-//                .background(color = Color.Gray)
-//        ) {
-//            Column() {
-//                Text("Bengaluru")
-//                Text("Rain")
-//                Text("24 C")
-//
-//            }
-//        }
-//
-//
-//    }
+    @Composable
+    fun MainScreen(navController: NavController){
+        MainContent(navController = navController)
+
+    }
+
+    @Composable
+    fun DetailScreen(tempString:String){
+        Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()){
+            Text(text = "Temperature is ${tempString}")
+        }
+    }
+
 
 
     @Preview(showBackground = true)
