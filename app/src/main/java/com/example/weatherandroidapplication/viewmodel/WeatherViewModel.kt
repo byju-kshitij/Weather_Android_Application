@@ -89,6 +89,16 @@ class WeatherViewModel : ViewModel() {
                         latestWeatherObject.data[0].weather.description = latestDescription
                         latestWeatherObject.data[0].city_name = latestCity
 
+                        //Sample Initialisations
+                        latestWeatherObject.data[0].sunrise = "33"
+                        latestWeatherObject.data[0].sunset = "33"
+                        latestWeatherObject.data[0].rh = 33
+                        latestWeatherObject.data[0].vis = 33
+                        latestWeatherObject.data[0].clouds = 33
+                        latestWeatherObject.data[0].wind_spd = 33.0
+                        latestWeatherObject.data[0].pres = 33.0
+
+
                         WeatherObjectList.add(latestWeatherObject)
 
                     }
