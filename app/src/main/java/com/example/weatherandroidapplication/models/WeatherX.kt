@@ -1,5 +1,5 @@
 data class WeatherX(
-    val code: Int,
+    var code: Int,
     var description: String,
     val icon: String
 )

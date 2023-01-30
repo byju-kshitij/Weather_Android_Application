@@ -132,6 +132,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
     @Composable
     fun MainContent(navController: NavController) {
@@ -198,8 +199,12 @@ class MainActivity : ComponentActivity() {
         })
     }
 
-    fun codeToImage(code:Int){
-
+    fun codeToImage(code:Int): Int {
+        return when(code){
+            741-> R.drawable.icons8_fog_50
+            721 -> R.drawable.haze
+            else -> R.drawable.icons8_rain_cloud_48
+        }
 
     }
 
@@ -236,7 +241,7 @@ class MainActivity : ComponentActivity() {
                         horizontalAlignment = Alignment.End
                     ) {
                         //Text(text = "Icon", modifier = Modifier.padding(10.dp))
-                        Image(painter = painterResource(id = R.drawable.icons8_rain_cloud_48), contentDescription = "icon",
+                        Image(painter = painterResource(id = codeToImage(weatherOb.data[0].weather.code)), contentDescription = "icon",
                             modifier = Modifier
                                 .size(40.dp))
 
@@ -303,6 +308,7 @@ class MainActivity : ComponentActivity() {
 
         }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @Composable
     fun Navigation () {
 
@@ -347,6 +353,7 @@ class MainActivity : ComponentActivity() {
 
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @Composable
     fun MainScreen(navController: NavController){
         MainContent(navController = navController)
