@@ -26,7 +26,6 @@ class RepositoryClass {
 
         for(item in WeatherObjectList){
             daoObj.addWeatherToDB(item)
-                //daoObj.addWeatherToDB(temp,weatherDescription,city)
         }
 
     }

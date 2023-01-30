@@ -17,8 +17,6 @@ private val retrofit = Retrofit.Builder()
     .baseUrl(BASE_URL)
     .build()
 
-//"city=deoghar&country=IN&key=9fcb60c4b3984edb99886da0d26b8ee7"
-
 interface WeatherApiService {
 
     @GET("v2.0/current")
