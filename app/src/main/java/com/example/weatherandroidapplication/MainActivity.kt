@@ -64,7 +64,7 @@ class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //deleteAllWeatherData()
+        deleteAllWeatherData()
 
 
 
@@ -209,7 +209,7 @@ class MainActivity : ComponentActivity() {
 
                 Row() {
                     Column() {
-                        Text(text = weatherOb.data[0].city_name, modifier = Modifier.padding(10.dp))
+                        Text(text = weatherOb.data[0].city_name, modifier = Modifier.padding(10.dp), color = Color.Blue)
                         Text(text = weatherOb.data[0].weather.description, modifier = Modifier.padding(10.dp))
                         Text(text = weatherOb.data[0].temp.toString()+ "\u2103", modifier = Modifier.padding(10.dp))
                     }
