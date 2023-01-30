@@ -22,13 +22,20 @@ class DAO {
         list.value = weathers?.subList(0, weathers.size)
         return list
     }
-    fun addWeatherToDB(temp: Int, weatherDescription: String,city:String) {
+    fun addWeatherToDB(weatherOb:WeatherClass) {
         isDataBaseEmpty = false
         realm.executeTransaction { r: Realm ->
             val weather = r.createObject(WeatherModel::class.java, UUID.randomUUID().toString())
-            weather.temp = temp!!
-            weather.city = city!!
-            weather.description = weatherDescription!!
+            weather.temp = weatherOb.data[0].temp!!
+            weather.city = weatherOb.data[0].city_name!!
+            weather.description = weatherOb.data[0].weather.description!!
+            weather.sunrise = weatherOb.data[0].sunrise
+            weather.sunset = weatherOb.data[0].sunset
+            weather.humidity = weatherOb.data[0].rh
+            weather.visibility = weatherOb.data[0].vis
+            weather.clouds = weatherOb.data[0].clouds
+            weather.winds = weatherOb.data[0].wind_spd
+            weather.pressure = weatherOb.data[0].pres
             realm.insertOrUpdate(weather)
         }
     }

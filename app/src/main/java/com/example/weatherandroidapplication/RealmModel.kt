@@ -15,4 +15,25 @@ open class WeatherModel : RealmModel {
     @Required
     var description:String? = ""
 
+    @Required
+    var sunrise : String? = ""
+
+    @Required
+    var sunset : String? = ""
+
+    @Required
+    var humidity : Int? = 0
+
+    @Required
+    var visibility : Int? = 0
+
+    @Required
+    var clouds : Int? = 0
+
+    @Required
+    var winds : Double? = 0.0
+
+    @Required
+    var pressure : Double? = 0.0
+
 }

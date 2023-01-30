@@ -25,7 +25,7 @@ class RepositoryClass {
     fun adddToDB(WeatherObjectList:ArrayList<WeatherClass>){
 
         for(item in WeatherObjectList){
-            daoObj.addWeatherToDB(item.data[0].temp,item.data[0].weather.description,item.data[0].city_name)
+            daoObj.addWeatherToDB(item)
                 //daoObj.addWeatherToDB(temp,weatherDescription,city)
         }
 
