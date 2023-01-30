@@ -1,6 +1,5 @@
-package com.example.weatherandroidapplication.Models
+package com.example.weatherandroidapplication.models
 
-import com.squareup.moshi.Json
 //data class WeatherClass(
 //    @field:Json(name = "count")
 //    val count:Int ,
@@ -12,5 +11,5 @@ data class WeatherClass(
     //@field:Json(name = "count")
     val count: Int,
     //@field:Json(name = "data")
-    val data: List<Data>
+    val data: ArrayList<Data>
 )
