@@ -58,7 +58,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //deleteAllWeatherData()
+        deleteAllWeatherData()
 
         setContent {
             LaunchedEffect(Unit) {
@@ -83,10 +83,10 @@ class MainActivity : ComponentActivity() {
         weatherViewModel.getWeatherData()
     }
 
-//    private fun deleteAllWeatherData() {
-//        println("delete Weather Data called")
-//        RepoObj.deleteAllDBData()
-//    }
+    private fun deleteAllWeatherData() {
+        println("delete Weather Data called")
+        RepoObj.deleteAllDBData()
+    }
 
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
     @Composable
