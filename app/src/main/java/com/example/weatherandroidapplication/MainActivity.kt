@@ -10,6 +10,7 @@ import androidx.activity.viewModels
 import androidx.annotation.WorkerThread
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.*
@@ -284,29 +285,182 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun DetailScreen(sunrise:String,sunset:String,humidity:String,visibility:String,clouds:String,winds:String,pressure:String){
-        //Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()){
-        Column() {
-            Text(text = "GMT Sunrise time is ${sunrise}")
-            Spacer(modifier = Modifier.height(15.dp))
-            Text(text = "GMT Sunset time is ${sunset}")
-//            Spacer(modifier = Modifier.height(15.dp))
-//            Text(text = "Precipitation in mm ${precipitation}")
-            Spacer(modifier = Modifier.height(15.dp))
-            Text(text = "Humidity Percentage is ${humidity}")
-            Spacer(modifier = Modifier.height(15.dp))
-            Text(text = "Visibility Percentage is ${visibility}")
-            Spacer(modifier = Modifier.height(15.dp))
-            Text(text = "Clouds is ${clouds}")
-            Spacer(modifier = Modifier.height(15.dp))
-            Text(text = "Wind Speed is ${winds}")
-            Spacer(modifier = Modifier.height(15.dp))
-            Text(text = "Pressure is ${pressure}")
+    fun CardWithContentColor(property:String,value:String) {
+        val paddingModifier = Modifier.padding(7.dp)
+        Card(
+            elevation = 100.dp,
+            contentColor = Color.Blue,border = BorderStroke(1.dp, Color.Blue),
+            modifier = paddingModifier.fillMaxWidth()
+        ) {
+            Column(modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(text = property,
+                    modifier = paddingModifier)
+                Text(text = value,
+                    color = Color.Black,
+                    modifier = paddingModifier)
 
+            }
+        }
+    }
+
+    @Composable
+    fun DetailScreen(sunrise:String,sunset:String,humidity:String,visibility:String,clouds:String,winds:String,pressure:String){
+
+        Column() {
+
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .padding(30.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(100.dp)
+                        .weight(1f)
+                        .padding(horizontal = 5.dp)
+                        //.background(Color.Blue)
+                ){
+                    CardWithContentColor(property = "Sunrise", value = sunrise )
+                }
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(100.dp)
+                        .weight(1f)
+                        .padding(horizontal = 5.dp)
+                        //.background(Color.Blue)
+                ){
+                    CardWithContentColor(property = "Sunset", value = sunset )
+                }
+
+            }
+
+
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .padding(30.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(100.dp)
+                        .weight(1f)
+                        .padding(horizontal = 5.dp)
+                        //.background(Color.Blue)
+                ){
+                    CardWithContentColor(property = "Humidity", value = humidity )
+                }
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(100.dp)
+                        .weight(1f)
+                        .padding(horizontal = 5.dp)
+                        //.background(Color.Blue)
+                ){
+                    CardWithContentColor(property = "Visibility", value = visibility )
+                }
+
+            }
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .padding(30.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(100.dp)
+                        .weight(1f)
+                        .padding(horizontal = 5.dp)
+                        //.background(Color.Blue)
+                ){
+                    CardWithContentColor(property = "Clouds", value = clouds )
+                }
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(100.dp)
+                        .weight(1f)
+                        .padding(horizontal = 5.dp)
+                        //.background(Color.Blue)
+                ){
+                    CardWithContentColor(property = "Winds", value = winds )
+                }
+
+            }
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .padding(30.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(100.dp)
+                        .weight(1f)
+                        .padding(horizontal = 5.dp)
+                        //.background(Color.Blue)
+                ){
+                    CardWithContentColor(property = "Pressure", value = pressure )
+                }
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(100.dp)
+                        .weight(1f)
+                        .padding(horizontal = 5.dp)
+                        //.background(Color.Blue)
+                ){
+                    CardWithContentColor(property = "Precipitation", value = "null" )
+                }
+
+            }
+
+
+
+
+
+
+            /*
+
+            Row() {
+                CardWithContentColor(property = "Humidity", value = humidity )
+                CardWithContentColor(property = "Visibility", value = visibility )
+            }
+
+            Row() {
+                CardWithContentColor(property = "Clouds", value = clouds )
+                CardWithContentColor(property = "Winds", value = winds )
+            }
+
+            Row() {
+                CardWithContentColor(property = "Pressure", value = pressure )
+            }
+
+
+             */
+
+//            Text(text = "GMT Sunrise time is ${sunrise}")
+//            Spacer(modifier = Modifier.height(15.dp))
+//            Text(text = "GMT Sunset time is ${sunset}")
+//            Spacer(modifier = Modifier.height(15.dp))
+//            Text(text = "Humidity Percentage is ${humidity}")
+//            Spacer(modifier = Modifier.height(15.dp))
+//            Text(text = "Visibility Percentage is ${visibility}")
+//            Spacer(modifier = Modifier.height(15.dp))
+//            Text(text = "Clouds is ${clouds}")
+//            Spacer(modifier = Modifier.height(15.dp))
+//            Text(text = "Wind Speed is ${winds}")
+//            Spacer(modifier = Modifier.height(15.dp))
+//            Text(text = "Pressure is ${pressure}")
 
         }
 
-        //}
     }
 
 
