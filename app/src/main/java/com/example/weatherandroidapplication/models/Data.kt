@@ -18,7 +18,7 @@ data class Data(
     val h_angle: Int = 0,
     val lat: Double= 0.0,
     val lon: Double= 0.0,
-    val ob_time: String = "",
+    var ob_time: String = "",
     val pod: String = "",
     val precip: Any= 0,
     var pres: Double= 0.0,

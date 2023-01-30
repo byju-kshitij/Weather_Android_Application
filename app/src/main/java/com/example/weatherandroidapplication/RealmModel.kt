@@ -16,6 +16,9 @@ open class WeatherModel : RealmModel {
     var description:String? = ""
 
     @Required
+    var ob_time:String? = ""
+
+    @Required
     var sunrise : String? = ""
 
     @Required

@@ -29,6 +29,7 @@ class DAO {
             weather.temp = weatherOb.data[0].temp!!
             weather.city = weatherOb.data[0].city_name!!
             weather.description = weatherOb.data[0].weather.description!!
+            weather.ob_time = weatherOb.data[0].ob_time
             weather.sunrise = weatherOb.data[0].sunrise
             weather.sunset = weatherOb.data[0].sunset
             weather.humidity = weatherOb.data[0].rh

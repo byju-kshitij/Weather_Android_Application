@@ -97,6 +97,7 @@ class WeatherViewModel : ViewModel() {
                         latestWeatherObject.data[0].clouds = lastUpdatedWeatherModelObject.clouds!!
                         latestWeatherObject.data[0].wind_spd = lastUpdatedWeatherModelObject.winds!!
                         latestWeatherObject.data[0].pres = lastUpdatedWeatherModelObject.pressure!!
+                        latestWeatherObject.data[0].ob_time = lastUpdatedWeatherModelObject.ob_time!!
 
 
                         WeatherObjectList.add(latestWeatherObject)

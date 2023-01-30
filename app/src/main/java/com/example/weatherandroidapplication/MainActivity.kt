@@ -2,11 +2,15 @@ package com.example.weatherandroidapplication
 
 import android.annotation.SuppressLint
 import android.graphics.Paint.Align
+import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.widget.Space
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.annotation.WorkerThread
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -14,13 +18,14 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -41,13 +46,13 @@ import com.example.weatherandroidapplication.viewmodel.WeatherRequest.Ideal
 import com.example.weatherandroidapplication.viewmodel.WeatherRequest.Loading
 import com.example.weatherandroidapplication.viewmodel.WeatherRequest.Success
 import com.example.weatherandroidapplication.viewmodel.WeatherViewModel
-
-
-
-
-
-
-
+import java.text.ParseException
+import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 class MainActivity : ComponentActivity() {
@@ -56,9 +61,13 @@ class MainActivity : ComponentActivity() {
 
     val RepoObj = RepositoryClass()
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //deleteAllWeatherData()
+
+
+
 
         setContent {
             LaunchedEffect(Unit) {
@@ -83,9 +92,44 @@ class MainActivity : ComponentActivity() {
         weatherViewModel.getWeatherData()
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun calculateMinUopdatedAgo(lastUpdatedTime:String):String{
+
+        val greenwhich_date_time = LocalDateTime.now().minusHours(5).minusMinutes(30)
+
+        val st:String = lastUpdatedTime
+        var last_updated_time_hrs :String = ""
+        for (i in st.length-5..st.length-4){
+            last_updated_time_hrs+=st[i]
+        }
+        var hh = last_updated_time_hrs.toInt()
+
+        var last_updated_time_mins :String = ""
+        for (i in st.length-2..st.length-1){
+            last_updated_time_mins+=st[i]
+        }
+        var mm = last_updated_time_mins.toInt()
+
+        return greenwhich_date_time.minusHours(hh.toLong()).minusMinutes(mm.toLong()).minute.toString()
+
+    }
+
     private fun deleteAllWeatherData() {
         println("delete Weather Data called")
         RepoObj.deleteAllDBData()
+    }
+
+    fun String.getDateWithServerTimeStamp(): Date? {
+        val dateFormat = SimpleDateFormat(
+            "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
+            Locale.getDefault()
+        )
+        dateFormat.timeZone = TimeZone.getTimeZone("GMT")  // IMP !!!
+        try {
+            return dateFormat.parse(this)
+        } catch (e: ParseException) {
+            return null
+        }
     }
 
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -154,6 +198,12 @@ class MainActivity : ComponentActivity() {
         })
     }
 
+    fun codeToImage(code:Int){
+
+
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
     @Composable
     fun CardWithBorder(weatherOb: WeatherClass,navController: NavController) {
         Column() {
@@ -192,7 +242,7 @@ class MainActivity : ComponentActivity() {
 
                         Spacer(modifier = Modifier.height(40.dp))
 
-                                Text(text = "Last updated 10 min ago", modifier = Modifier.padding(10.dp))
+                                Text(text = "Last updated ${calculateMinUopdatedAgo(weatherOb.data[0].ob_time)} min ago", modifier = Modifier.padding(10.dp))
                     }
                 }
 
@@ -202,12 +252,14 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @Composable
     fun AddCard(weatherOb:WeatherClass,navController: NavController) {
         CardWithBorder(weatherOb, navController = navController)
     }
 
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @Composable
     fun InitialCitiesDisplay(weatherData: ArrayList<WeatherClass>,navController: NavController) {
 
@@ -222,12 +274,29 @@ class MainActivity : ComponentActivity() {
                     AddCard(weatherOb = item,navController)
                 }
             }
-            Button(
-                onClick = { callWeatherApi("Mumbai") }, modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentSize(Alignment.Center)
+//            Button(
+//                onClick = { callWeatherApi("Mumbai") }, modifier = Modifier
+//                    .fillMaxWidth()
+//                    .wrapContentSize(Alignment.Center)
+//            ) {
+//                Text(text = "Refresh")
+//            }
+
+            FloatingActionButton(
+                // on below line we are adding on click for our fab
+                onClick = {
+                    callWeatherApi("Mumbai")
+                },
+                // on below line we are adding
+                // background color for our button
+                backgroundColor = Color.Red,
+                // on below line we are adding
+                // color for our content of fab.
+                contentColor = Color.White, modifier = Modifier.fillMaxSize().wrapContentSize(Alignment.Center)
             ) {
-                Text(text = "Refresh")
+                // on below line we are
+                // adding icon for button.
+                Icon(Icons.Filled.Refresh, "")
             }
         }
 
