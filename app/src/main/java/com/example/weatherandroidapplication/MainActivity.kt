@@ -64,7 +64,7 @@ class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //deleteAllWeatherData()
+        deleteAllWeatherData()
 
 
 
@@ -85,7 +85,6 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun callWeatherApi(city:String) {
-        println("callWeatherApi called")
         weatherViewModel.city = city
         weatherViewModel.country = "IN"
         weatherViewModel.key = "2facb83973524c8e927e726516722a3d"
@@ -115,21 +114,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun deleteAllWeatherData() {
-        println("delete Weather Data called")
         RepoObj.deleteAllDBData()
-    }
-
-    fun String.getDateWithServerTimeStamp(): Date? {
-        val dateFormat = SimpleDateFormat(
-            "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
-            Locale.getDefault()
-        )
-        dateFormat.timeZone = TimeZone.getTimeZone("GMT")  // IMP !!!
-        try {
-            return dateFormat.parse(this)
-        } catch (e: ParseException) {
-            return null
-        }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -138,14 +123,10 @@ class MainActivity : ComponentActivity() {
     fun MainContent(navController: NavController) {
 
         lifecycleScope.launchWhenStarted {
-            print("Inside lifeCycle Scope")
-
             callWeatherApi("Mumbai")
         }
 
         val state: State<WeatherRequest> = weatherViewModel.stateFlow.collectAsState()
-        println("State = $state")
-
 
         Scaffold(topBar = {
             TopAppBar(title = {
@@ -188,10 +169,6 @@ class MainActivity : ComponentActivity() {
                         .wrapContentSize(align = Alignment.Center))
                  }
                 is Success -> {
-                    println("Fetched Data!!")
-
-
-
                     InitialCitiesDisplay((state.value as Success).data,navController = navController)
                 }
             }
@@ -232,7 +209,7 @@ class MainActivity : ComponentActivity() {
 
                 Row() {
                     Column() {
-                        Text(text = weatherOb.data[0].city_name, modifier = Modifier.padding(10.dp))
+                        Text(text = weatherOb.data[0].city_name, modifier = Modifier.padding(10.dp), color = Color.Blue)
                         Text(text = weatherOb.data[0].weather.description, modifier = Modifier.padding(10.dp))
                         Text(text = weatherOb.data[0].temp.toString()+ "\u2103", modifier = Modifier.padding(10.dp))
                     }
@@ -240,7 +217,6 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier.fillMaxWidth(),
                         horizontalAlignment = Alignment.End
                     ) {
-                        //Text(text = "Icon", modifier = Modifier.padding(10.dp))
                         Image(painter = painterResource(id = codeToImage(weatherOb.data[0].weather.code)), contentDescription = "icon",
                             modifier = Modifier
                                 .size(40.dp))
@@ -268,39 +244,20 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun InitialCitiesDisplay(weatherData: ArrayList<WeatherClass>,navController: NavController) {
 
-        print("From  Main Vieww... Weather Data List is ")
-        for(item in weatherData){
-            println(item)
-        }
-
         Column() {
             LazyColumn {
                 itemsIndexed(items = weatherData) { index, item ->
                     AddCard(weatherOb = item,navController)
                 }
             }
-//            Button(
-//                onClick = { callWeatherApi("Mumbai") }, modifier = Modifier
-//                    .fillMaxWidth()
-//                    .wrapContentSize(Alignment.Center)
-//            ) {
-//                Text(text = "Refresh")
-//            }
 
             FloatingActionButton(
-                // on below line we are adding on click for our fab
                 onClick = {
                     callWeatherApi("Mumbai")
                 },
-                // on below line we are adding
-                // background color for our button
                 backgroundColor = Color.Red,
-                // on below line we are adding
-                // color for our content of fab.
                 contentColor = Color.White, modifier = Modifier.fillMaxSize().wrapContentSize(Alignment.Center)
             ) {
-                // on below line we are
-                // adding icon for button.
                 Icon(Icons.Filled.Refresh, "")
             }
         }
@@ -343,9 +300,6 @@ class MainActivity : ComponentActivity() {
                     }
             )
             ){
-//                entry ->
-//                entry.arguments?.getString("tempStr")?.let { DetailScreen(tempString = it) }
-
                 entry -> DetailScreen(sunrise = entry.arguments?.getString("sunrise")!!, sunset = entry.arguments?.getString("sunset")!! , humidity = entry.arguments?.getString("humidity")!! , visibility = entry.arguments?.getString("visibility")!!, clouds = entry.arguments?.getString("clouds")!!, winds = entry.arguments?.getString("winds")!!, pressure = entry.arguments?.getString("pressure")!! )
             }
 
@@ -498,43 +452,6 @@ class MainActivity : ComponentActivity() {
             }
 
 
-
-
-
-
-            /*
-
-            Row() {
-                CardWithContentColor(property = "Humidity", value = humidity )
-                CardWithContentColor(property = "Visibility", value = visibility )
-            }
-
-            Row() {
-                CardWithContentColor(property = "Clouds", value = clouds )
-                CardWithContentColor(property = "Winds", value = winds )
-            }
-
-            Row() {
-                CardWithContentColor(property = "Pressure", value = pressure )
-            }
-
-
-             */
-
-//            Text(text = "GMT Sunrise time is ${sunrise}")
-//            Spacer(modifier = Modifier.height(15.dp))
-//            Text(text = "GMT Sunset time is ${sunset}")
-//            Spacer(modifier = Modifier.height(15.dp))
-//            Text(text = "Humidity Percentage is ${humidity}")
-//            Spacer(modifier = Modifier.height(15.dp))
-//            Text(text = "Visibility Percentage is ${visibility}")
-//            Spacer(modifier = Modifier.height(15.dp))
-//            Text(text = "Clouds is ${clouds}")
-//            Spacer(modifier = Modifier.height(15.dp))
-//            Text(text = "Wind Speed is ${winds}")
-//            Spacer(modifier = Modifier.height(15.dp))
-//            Text(text = "Pressure is ${pressure}")
-
         }
 
     }
@@ -545,9 +462,6 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun DefaultPreview() {
         WeatherAndroidApplicationTheme {
-//            InitialCitiesDisplay(WeatherClass(
-//                0, "", ""
-//            ))
         }
     }
 }
